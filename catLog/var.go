@@ -12,7 +12,6 @@ var (
 	logDir = filepath.Join(define.RootPath, "logs")
 
 	// 日志路径
-	//
 	logExt = ".log"
 
 	// 日志保留天数
