@@ -1,4 +1,4 @@
-package redisPool
+package redis
 
 import (
 	"github.com/chaksunshine/kit/thread"
@@ -109,7 +109,7 @@ func (obj *ClusterClient) ClusterNode() (NodeSet, error) {
 // @param cfg 配置信息
 func NewClusterClient(cfg *Config) (*ClusterClient, error) {
 
-	if err := cfg.init(0); err != nil {
+	if err := cfg.init(); err != nil {
 		return nil, err
 	}
 

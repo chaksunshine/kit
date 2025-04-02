@@ -19,13 +19,13 @@ type DocCreateParams struct {
 // 添加一条记录
 // @param id 数据id
 // @param data 数据
-func (obj *DocCreateParams) Add(id int, data interface{}) error {
+func (obj *DocCreateParams) Add(id int64, data interface{}) error {
 	marshal, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 	obj.items = append(obj.items, &DocCreateItemParams{
-		Id:      int64(id),
+		Id:      id,
 		Content: string(marshal),
 	})
 	return nil

@@ -24,17 +24,6 @@ const (
 	ProTypeBoolean ProType = "boolean" // 布尔类型
 )
 
-// 分词器
-type ProAnalyzer string
-
-const (
-	ProAnalyzerIKMaxWord ProAnalyzer = "ik_max_word" // 提供更高的召回率，但可能增加索引大小和查询时间
-	ProAnalyzerIKSmart   ProAnalyzer = "ik_smart"    // 更高效，适合对语义完整性要求较高的场景
-	ProAnalyzerStand     ProAnalyzer = "standard"
-)
-
-//text、keyword、date、integer、float、boolean
-
 // 创建index参数信息
 type IndexCreateParams struct {
 
@@ -61,7 +50,7 @@ func (obj *IndexCreateParams) AddProperties(name string, types ProType, analyzer
 	// 执行默认分词器
 	var analyzerValue string
 	if types == ProTypeText {
-		analyzerValue = string(ProAnalyzerStand)
+		analyzerValue = string(ProAnalyzerIKSmart)
 
 		if len(analyzer) > 0 {
 			analyzerValue = string(analyzer[0])

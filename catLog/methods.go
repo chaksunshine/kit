@@ -19,9 +19,7 @@ func Error(msg string) {
 
 // 严重错误信息
 func FatalError(msg string) {
-	for index := 0; index < 10; index++ {
-		_instance.error(msg)
-		time.Sleep(time.Second)
-	}
+	_instance.error(msg)
+	time.Sleep(time.Second * 5)
 	os.Exit(2)
 }

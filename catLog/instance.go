@@ -87,6 +87,7 @@ func (obj *instance) reConnect() {
 		return
 	}
 	obj.lastLogger = resource
+	_, _ = resource.Write([]byte(fmt.Sprintf("\n\nlog init in %s\n", time.Now())))
 
 	// 2. 定义日志编码器配置
 	encoderConfig := zapcore.EncoderConfig{

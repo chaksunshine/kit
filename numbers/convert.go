@@ -15,3 +15,9 @@ func StringToInt64Must(str string) int64 {
 	atoi, _ := strconv.ParseInt(str, 10, 64)
 	return atoi
 }
+
+// 将字符串转换成Int32
+func StringToInt32Must(str string) int32 {
+	atoi, _ := strconv.ParseInt(str, 10, 32)
+	return int32(atoi)
+}

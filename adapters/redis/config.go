@@ -1,4 +1,4 @@
-package redisPool
+package redis
 
 import (
 	"errors"
@@ -25,12 +25,12 @@ type Config struct {
 	ConnectTimeout int `yaml:"connectTimeout"`
 
 	// 使用的库文件
-	database int
+	Database int `yaml:"database"`
 }
 
 // 初始化
 // @param database 库文件
-func (obj *Config) init(database int) error {
+func (obj *Config) init() error {
 
 	if len(obj.Node) <= 0 {
 		return errors.New(fmt.Sprintf("未知的链接地址"))
@@ -45,7 +45,5 @@ func (obj *Config) init(database int) error {
 	if obj.ConnectTimeout == 0 {
 		obj.ConnectTimeout = 10
 	}
-
-	obj.database = database
 	return nil
 }

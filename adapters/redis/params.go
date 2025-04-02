@@ -1,4 +1,4 @@
-package redisPool
+package redis
 
 import (
 	"fmt"
