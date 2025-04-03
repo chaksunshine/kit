@@ -22,3 +22,19 @@ func FolderMustCreate(dir string) error {
 	}
 	return errors.New(fmt.Sprintf("%s 存在,但不是目录", dir))
 }
+
+// 目录是否存在
+// @param dir 文件夹
+func FolderExist(dir string) error {
+
+	// 检查目录是否存在,如果不存在就必须创建
+	stat, err := os.Stat(dir)
+	if err != nil {
+		return err
+	}
+
+	if stat.IsDir() {
+		return nil
+	}
+	return errors.New(fmt.Sprintf("%s 存在,但不是目录", dir))
+}

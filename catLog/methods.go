@@ -20,6 +20,6 @@ func Error(msg string) {
 // 严重错误信息
 func FatalError(msg string) {
 	_instance.error(msg)
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 3)
 	os.Exit(2)
 }

@@ -6,25 +6,31 @@ import (
 	"github.com/chaksunshine/kit/thread"
 	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
+	"time"
 )
 
 // 发送消息
 // @author fuzeyu
 // @date 2025/4/2
-type process struct {
+type Process struct {
 	notify chan *FeishuApp
 }
 
 // 发送消息
 // @param app 配置信息
 // @param message 消息信息
-func (obj *process) Send(app *FeishuApp, message *Message) {
-	app.msg = message.parser()
-	obj.notify <- app
+func (obj *Process) Send(message *Message, app ...*FeishuApp) {
+	parser := message.parser()
+	for _, item := range app {
+		item.msg = parser
+
+		obj.notify <- item
+		time.Sleep(time.Millisecond * 20)
+	}
 }
 
 // 发送消息
-func (obj *process) sendMessage(app *FeishuApp) {
+func (obj *Process) sendMessage(app *FeishuApp) {
 
 	client := lark.NewClient(app.AppId, app.AppSecret)
 
@@ -53,21 +59,24 @@ func (obj *process) sendMessage(app *FeishuApp) {
 }
 
 // 开始消费
-func (obj *process) consume() {
+func (obj *Process) consume() {
 	for app := range obj.notify {
 		obj.sendMessage(app)
 	}
 }
 
-func newProcess() *process {
-	c := &process{
+// @param processNumber 发送消息的线程数
+func NewProcess(processNumber int) *Process {
+	c := &Process{
 		notify: make(chan *FeishuApp, 20),
 	}
 
-	for index := 0; index < 3; index++ {
+	if processNumber <= 0 {
+		catLog.FatalError(fmt.Sprintf("飞书工作线程数异常 %d", processNumber))
+	}
+
+	for index := 0; index < processNumber; index++ {
 		go c.consume()
 	}
 	return c
 }
-
-var ProcessLogic = newProcess()
