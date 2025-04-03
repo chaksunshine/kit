@@ -11,6 +11,7 @@ import (
 	"io"
 )
 
+// Aes加解密
 type aesCry struct {
 }
 

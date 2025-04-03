@@ -41,7 +41,7 @@ func ReadFile(name string) ([]byte, []string) {
 		filepath.Join(define.RootPath, fmt.Sprintf("%s.yaml", name)),
 		filepath.Join(define.RootPath, "config", fmt.Sprintf("%s.yml", name)),
 		filepath.Join(define.RootPath, "config", fmt.Sprintf("%s.yaml", name)),
-		filepath.Join(define.RootPath, "conf", fmt.Sprintf("%s.yaml", name)),
+		filepath.Join(define.RootPath, "conf", fmt.Sprintf("%s.yml", name)),
 		filepath.Join(define.RootPath, "conf", fmt.Sprintf("%s.yaml", name)),
 	}
 	for _, item := range paths {
