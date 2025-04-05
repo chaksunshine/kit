@@ -8,24 +8,31 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 )
 
 // Aes加解密
-type aesCry struct {
+type AesCry struct {
+	aesKey []byte
+}
+
+// 验证密钥信息是否正确
+// @param key Key信息
+func (obj *AesCry) parserHashedKey(key string) error {
+	lengths := 60
+	if len(key) < lengths {
+		return errors.New(fmt.Sprintf("密钥长度不能少于 %d 位", lengths))
+	}
+	sum256 := sha256.Sum256([]byte(key))
+	obj.aesKey = sum256[:32]
+	return nil
 }
 
 // AES加密核心函数
 // @param  plaintext []byte 待加密的明文
 // @param key string 密钥
-func (obj *aesCry) Encrypt(value []byte, key string) (string, error) {
-
-	if len(key) < 32 {
-		return "", errors.New("密钥长度过短")
-	}
-
-	hashedKey := sha256.Sum256([]byte(key))
-	aesKey := hashedKey[:32] // 使用SHA256生成32字节密钥
+func (obj *AesCry) Encrypt(value []byte) (string, error) {
 
 	// 生成随机IV
 	iv := make([]byte, aes.BlockSize)
@@ -34,7 +41,7 @@ func (obj *aesCry) Encrypt(value []byte, key string) (string, error) {
 	}
 
 	// 创建加密块
-	block, err := aes.NewCipher(aesKey)
+	block, err := aes.NewCipher(obj.aesKey)
 	if err != nil {
 		return "", err
 	}
@@ -55,10 +62,7 @@ func (obj *aesCry) Encrypt(value []byte, key string) (string, error) {
 // AES解密核心函数
 // @param  encodedText []byte 编码密钥
 // @param key string 密钥
-func (obj *aesCry) Decrypt(encodedText string, key string) ([]byte, error) {
-	// 处理密钥
-	hashedKey := sha256.Sum256([]byte(key))
-	aesKey := hashedKey[:32]
+func (obj *AesCry) Decrypt(encodedText string) ([]byte, error) {
 
 	// 解码Base64
 	combined, err := base64.StdEncoding.DecodeString(encodedText)
@@ -74,7 +78,7 @@ func (obj *aesCry) Decrypt(encodedText string, key string) ([]byte, error) {
 	ciphertext := combined[aes.BlockSize:]
 
 	// 创建解密块
-	block, err := aes.NewCipher(aesKey)
+	block, err := aes.NewCipher(obj.aesKey)
 	if err != nil {
 		return nil, err
 	}
@@ -89,13 +93,13 @@ func (obj *aesCry) Decrypt(encodedText string, key string) ([]byte, error) {
 }
 
 // PKCS7填充
-func (obj *aesCry) pKCS7Padding(src []byte, blockSize int) []byte {
+func (obj *AesCry) pKCS7Padding(src []byte, blockSize int) []byte {
 	padding := blockSize - len(src)%blockSize
 	return append(src, bytes.Repeat([]byte{byte(padding)}, padding)...)
 }
 
 // PKCS7去填充
-func (obj *aesCry) pKCS7Unpadding(src []byte) ([]byte, error) {
+func (obj *AesCry) pKCS7Unpadding(src []byte) ([]byte, error) {
 	length := len(src)
 	if length == 0 {
 		return nil, errors.New("invalid padding")
@@ -107,4 +111,11 @@ func (obj *aesCry) pKCS7Unpadding(src []byte) ([]byte, error) {
 	return src[:length-un], nil
 }
 
-var AesCry = new(aesCry)
+// @param serverKey 加密密钥
+func NewAes(key string) (*AesCry, error) {
+	data := &AesCry{}
+	if err := data.parserHashedKey(key); err != nil {
+		return nil, err
+	}
+	return data, nil
+}

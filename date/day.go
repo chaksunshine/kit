@@ -12,11 +12,11 @@ func TodayFirstTime() time.Time {
 }
 
 // 获取明日凌晨上下文
-// @param sub 延迟时间
-func TomorrowContext(sub ...time.Duration) context.Context {
+// @param after 向后延迟的时间
+func TomorrowContext(after ...time.Duration) context.Context {
 	firstTime := TodayFirstTime().Add(time.Hour * 24)
-	if len(sub) > 0 {
-		firstTime = firstTime.Add(sub[0])
+	if len(after) > 0 {
+		firstTime = firstTime.Add(after[0])
 	}
 	deadline, _ := context.WithDeadline(context.TODO(), firstTime)
 	return deadline
