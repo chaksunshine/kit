@@ -1,6 +1,7 @@
 package requester
 
 import (
+	"github.com/chaksunshine/kit/json"
 	"github.com/chaksunshine/kit/thread"
 	"io"
 	"net/http"
@@ -36,27 +37,62 @@ func (obj *Client) formatRequester(request *http.Request) {
 	}
 }
 
-// 按照GET请求,获取一个网页信息
+// 获取get请求的buffer对象
 // @param uri 请求的uri
-func (obj *Client) GetString(uri string) (string, error) {
-
+func (obj *Client) getBuffers(uri string) (*http.Response, error) {
 	request, err := http.NewRequestWithContext(thread.CtxRequest(), "GET", uri, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	obj.formatRequester(request)
 
 	do, err := obj.httpClient.Do(request)
-	if err != nil {
-		return "", err
-	}
-	defer do.Body.Close()
+	return do, err
+}
 
-	all, err := io.ReadAll(do.Body)
+// 按照GET请求,获取一个网页信息
+// @param uri 请求的uri
+func (obj *Client) GET(uri string) ([]byte, error) {
+	buffers, err := obj.getBuffers(uri)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(all), nil
+	return io.ReadAll(buffers.Body)
+}
+
+// 按照GET请求,获取一个网页信息,并格式化为json
+// @param uri 请求的uri
+// @param data 数据格式
+// @param getBuffers 获取buffer内容
+func (obj *Client) GETFormtJson(uri string, data interface{}, loadBuffers ...bool) ([]byte, error) {
+
+	buffers, err := obj.getBuffers(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取buffer内容
+	if len(loadBuffers) == 1 && loadBuffers[0] {
+
+		// 获取内容
+		all, err := io.ReadAll(buffers.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		// 解析内容
+		if err := json.Unmarshal(all, &data); err != nil {
+			return nil, err
+		}
+		return all, nil
+	}
+
+	// 不获取buffer内容
+	decoder := json.NewDecoder(buffers.Body)
+	if err := decoder.Decode(&data); err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 // @param httpClient 客户端信息
