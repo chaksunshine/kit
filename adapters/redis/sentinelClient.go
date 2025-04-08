@@ -13,13 +13,8 @@ import (
 // @author fuzeyu
 // @date 2025/2/17
 type SentinelClient struct {
-	client *Client
-	cfg    *Config
-}
-
-// 获取链接
-func (obj *SentinelClient) Client() *Client {
-	return obj.client
+	*Client
+	cfg *Config
 }
 
 // 创建一个链接
@@ -53,7 +48,7 @@ func (obj *SentinelClient) connect() error {
 	if err != nil {
 		return errors.New(fmt.Sprintf("链接到哨兵集群信息失败 %s", err.Error()))
 	}
-	obj.client = connect
+	obj.Client = connect
 	return nil
 }
 

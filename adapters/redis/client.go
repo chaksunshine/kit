@@ -5,6 +5,7 @@ import (
 	"github.com/chaksunshine/kit/catLog"
 	"github.com/chaksunshine/kit/thread"
 	"github.com/redis/go-redis/v9"
+	"strings"
 )
 
 // 返回一个redisClient
@@ -28,6 +29,12 @@ func (obj *Client) Close() {
 	default:
 		catLog.Error(fmt.Sprintf("关闭redis客户端的时候发现未知的客户端 %T", obj.Cmdable))
 	}
+}
+
+// 拼接redis
+// @param load 加载信息
+func (obj *Client) Prefix(load ...string) string {
+	return strings.Join(load, ":")
 }
 
 // 获取当前节点信息
