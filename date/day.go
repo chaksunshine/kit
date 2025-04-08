@@ -21,3 +21,19 @@ func TomorrowContext(after ...time.Duration) context.Context {
 	deadline, _ := context.WithDeadline(context.TODO(), firstTime)
 	return deadline
 }
+
+// 获取本周的最后一天时间
+// @param week 获取周几的时间
+func WeekDay(week ...int) time.Time {
+
+	var card time.Weekday = 7
+	if len(week) > 0 && week[0] > 0 && week[0] < 8 {
+		card = time.Weekday(week[0])
+	}
+
+	now := time.Now()
+	weekday := now.Weekday()
+	daysUntilSunday := (time.Sunday - weekday + card) % card
+	sunday := now.Add(time.Hour * 24 * time.Duration(daysUntilSunday))
+	return time.Date(sunday.Year(), sunday.Month(), sunday.Day(), 0, 0, 0, 0, sunday.Location())
+}
